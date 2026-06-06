@@ -1,1 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Kosakata Minna no Nihongo - Bab 3 (Lengkap 67 Soal)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        japan: {
+                            light: '#f0f4f8',
+                            main: '#8c1c13',
+                            secondary: '#2d3748',
+                            accent: '#e2b714',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            }
+        }
+    </style>
+</head>
+<body class="bg-japan-light font-sans min-h-screen flex flex-col items-center py-8 px-4">
+    <div class="w-full max-w-2xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-japan-main text-shadow">
+                <i class="fa fa-book mr-2"></i> Kuis Kosakata Bab 3
+            </h1>
+            <p class="text-gray-600 mt-2">Minna no Nihongo - Lengkap 67 Soal | Pilihan A-E</p>
+        </div>
 
+        <!-- Info & Skor -->
+        <div id="infoPanel" class="bg-white rounded-xl p-5 card-shadow mb-6 flex justify-between items-center">
+            <div>
+                <span class="font-semibold text-japan-secondary">Soal: </span>
+                <span id="nomorSoal">1</span>/<span id="totalSoal">67</span>
+            </div>
+            <div>
+                <span class="font-semibold text-japan-secondary">Skor: </span>
+                <span id="skor">0</span>
+            </div>
+        </div>
+
+        <!-- Area Soal -->
+        <div id="areaSoal" class="bg-white rounded-xl p-6 card-shadow mb-6 min-h-[300px] flex flex-col justify-center">
+            <div id="teksSoal" class="text-xl md:text-2xl font-bold text-center text-japan-secondary mb-8 py-4">
+                <!-- Teks soal akan muncul di sini -->
+            </div>
+
+            <!-- Pilihan Jawaban (A-E) -->
+            <div id="pilihanJawaban" class="grid grid-cols-1 gap-4">
+                <!-- Pilihan jawaban dimuat di sini -->
+            </div>
+        </div>
+
+        <!-- Tombol Navigasi -->
+        <div class="flex justify-between items-center">
+            <button id="btnUlangi" class="hidden px-6 py-3 bg-japan-accent text-white rounded-lg font-medium hover:bg-yellow-600 transition-all">
+                <i class="fa fa-refresh mr-2"></i> Ulangi Kuis
+            </button>
+            <div class="ml-auto">
+                <button id="btnSelanjutnya" class="px-6 py-3 bg-japan-main text-white rounded-lg font-medium hover:bg-[#701610] transition-all opacity-70 cursor-not-allowed" disabled>
+                    Selanjutnya <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hasil Akhir -->
+        <div id="hasilAkhir" class="hidden mt-8 bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+            <i class="fa fa-trophy text-5xl text-japan-accent mb-3"></i>
+            <h2 class="text-2xl font-bold text-japan-secondary mb-2">Kuis Selesai!</h2>
+            <p class="text-lg mb-2">Skor akhir kamu: <span id="skorAkhir" class="font-bold text-japan-main text-xl"></span></p>
+            <p id="pesanHasil" class="text-gray-700"></p>
+        </div>
+    </div>
+
+    <script>
+        // Data Kosakata Bab 3 (Total 67 kata sesuai dokumen)
+        const kosakataBab3 = [
+            { jepang: 'ここ', arti: 'Disini' },
+            { jepang: 'そこ', arti: 'Disitu' },
+            { jepang: 'あそこ', arti: 'Disana' },
+            { jepang: 'どこ', arti: 'Dimana?' },
+            { jepang: 'こちら', arti: 'Disini / Ke arah sini' },
+            { jepang: 'そちら', arti: 'Disitu / Ke arah sana' },
+            { jepang: 'あちら', arti: 'Disana / Ke arah sana' },
+            { jepang: 'どちら', arti: 'Dimana? / Yang mana?' },
+            { jepang: 'きょうしつ / 教室', arti: 'Ruang kelas' },
+            { jepang: 'しょくどう / 食堂', arti: 'Ruang makan, Kantin' },
+            { jepang: 'じむしょ / 事務所', arti: 'Kantor' },
+            { jepang: 'かいぎしつ / 会議室', arti: 'Ruang rapat' },
+            { jepang: 'うけつけ / 受付', arti: 'Meja informasi / Penerimaan tamu' },
+            { jepang: 'ロビー', arti: 'Ruang tunggu, lobi' },
+            { jepang: 'へや / 部屋', arti: 'Kamar / Ruangan' },
+            { jepang: 'おてあらい / 手洗い', arti: 'Kamar kecil, WC' },
+            { jepang: 'トイレ', arti: 'Toilet' },
+            { jepang: 'かいだん / 階段', arti: 'Tangga' },
+            { jepang: 'エレベーター', arti: 'Lift' },
+            { jepang: 'エスカレーター', arti: 'Eskalator, tangga berjalan' },
+            { jepang: 'じどうはんばいき / 自動販売機', arti: 'Mesin jual otomatis' },
+            { jepang: 'でんわ / 電話', arti: 'Telepon' },
+            { jepang: 'おくに / お国', arti: 'Negara' },
+            { jepang: 'かいしゃ / 会社', arti: 'Perusahaan' },
+            { jepang: 'いえ / 家', arti: 'Rumah' },
+            { jepang: 'くつ / 靴', arti: 'Sepatu' },
+            { jepang: 'ネクタイ', arti: 'Dasi' },
+            { jepang: 'ワイン', arti: 'Anggur putih / Minuman anggur' },
+            { jepang: 'うりば / 売り場', arti: 'Tempat penjualan / Toko' },
+            { jepang: 'ちか / 地下', arti: 'Bawah tanah, basement' },
+            { jepang: '～かい / ～階', arti: 'Lantai~/tingkat~' },
+            { jepang: 'なんがい / 何階', arti: 'Lantai berapa?' },
+            { jepang: '～えん / ～円', arti: '~yen' },
+            { jepang: 'いくら', arti: 'Berapa harganya?' },
+            { jepang: 'ひゃく / 百', arti: 'Seratus' },
+            { jepang: 'せん / 千', arti: 'Seribu' },
+            { jepang: 'まん / 万', arti: 'Puluh ribu (10.000)' },
+            { jepang: 'すみません', arti: 'Maaf / Permisi' },
+            { jepang: 'ありがとう', arti: 'Terima kasih' },
+            { jepang: 'いらっしゃいませ', arti: 'Selamat datang' },
+            { jepang: 'みせてください / 見せてください', arti: 'Tolong perlihatkan' },
+            { jepang: 'それじゃあ', arti: 'Kalau begitu' },
+            { jepang: '～をください', arti: 'Tolong berikan / Tolong ambilkan' },
+            { jepang: 'イタリア', arti: 'Italia' },
+            { jepang: 'スイス', arti: 'Swis' },
+            { jepang: 'フランス', arti: 'Perancis' },
+            { jepang: 'ジャカルタ', arti: 'Jakarta' },
+            { jepang: 'バンコク', arti: 'Bangkok' },
+            { jepang: 'ベルリン', arti: 'Berlin' },
+            { jepang: 'おくじょう / 屋上', arti: 'Lantai atas / Atap' },
+            { jepang: 'レストラン', arti: 'Restoran' },
+            { jepang: 'ゆうえんち / 遊園地', arti: 'Tempat hiburan / Taman bermain' },
+            { jepang: 'ものものかいじょう / 催物会場', arti: 'Tempat pertunjukan' },
+            { jepang: 'めがね / 眼鏡', arti: 'Kacamata' },
+            { jepang: 'スポーツようひん / スポーツ用品', arti: 'Peralatan olahraga' },
+            { jepang: 'りょこうようひん / 旅行用品', arti: 'Peralatan wisata' },
+            { jepang: 'こどもふく / 子供服', arti: 'Pakaian anak' },
+            { jepang: 'おもちゃ', arti: 'Mainan' },
+            { jepang: 'ぶんぼうぐ / 文房具', arti: 'Alat tulis' },
+            { jepang: 'かぐ / 家具', arti: 'Perlengkapan rumah' },
+            { jepang: 'しょっき / 食器', arti: 'Peralatan makan' },
+            { jepang: 'でんかせいひん / 電化製品', arti: 'Barang elektronik' },
+            { jepang: 'しんしふく / 紳士服', arti: 'Pakaian pria' },
+            { jepang: 'ふじんふく / 婦人服', arti: 'Pakaian wanita' },
+            { jepang: 'アクセサリー', arti: 'Perhiasan, aksesoris' },
+            { jepang: 'けしょうひん / 化粧品', arti: 'Kosmetik' },
+            { jepang: 'しょくひん / 食品', arti: 'Makanan / Bahan makanan' }
+        ];
+
+        // Variabel Global
+        let daftarSoal = [];
+        let nomorSekarang = 0;
+        let skor = 0;
+        let jawabanTerpilih = null;
+        const JUMLAH_SOAL = 67; // Total seluruh kosakata Bab 3
+        const PILIHAN_JUMLAH = 5; // Pilihan A, B, C, D, E
+
+        // Elemen DOM
+        const elNomorSoal = document.getElementById('nomorSoal');
+        const elTotalSoal = document.getElementById('totalSoal');
+        const elSkor = document.getElementById('skor');
+        const elTeksSoal = document.getElementById('teksSoal');
+        const elPilihan = document.getElementById('pilihanJawaban');
+        const elBtnSelanjutnya = document.getElementById('btnSelanjutnya');
+        const elBtnUlangi = document.getElementById('btnUlangi');
+        const elHasilAkhir = document.getElementById('hasilAkhir');
+        const elSkorAkhir = document.getElementById('skorAkhir');
+        const elPesanHasil = document.getElementById('pesanHasil');
+
+        // Inisialisasi Kuis
+        function mulaiKuis() {
+            // Reset variabel
+            nomorSekarang = 0;
+            skor = 0;
+            jawabanTerpilih = null;
+            elSkor.innerText = skor;
+            elHasilAkhir.classList.add('hidden');
+            elBtnUlangi.classList.add('hidden');
+            elBtnSelanjutnya.disabled = true;
+            elBtnSelanjutnya.classList.add('opacity-70', 'cursor-not-allowed');
+            
+            // ACAK SELURUH DAFTAR KOSAKATA
+            daftarSoal = [...kosakataBab3].sort(() => Math.random() - 0.5);
+            elTotalSoal.innerText = JUMLAH_SOAL;
+            
+            tampilkanSoal();
+        }
+
+        // Tampilkan Soal Saat Ini
+        function tampilkanSoal() {
+            const soal = daftarSoal[nomorSekarang];
+            elNomorSoal.innerText = nomorSekarang + 1;
+            
+            // Tampilkan teks soal
+            elTeksSoal.innerHTML = `Apakah arti dari: <br><span class="text-japan-main text-3xl mt-2 inline-block">${soal.jepang}</span>`;
+            
+            // Bersihkan pilihan sebelumnya
+            elPilihan.innerHTML = '';
+            jawabanTerpilih = null;
+            elBtnSelanjutnya.disabled = true;
+            elBtnSelanjutnya.classList.add('opacity-70', 'cursor-not-allowed');
+
+            // Buat daftar jawaban salah (diambil secara acak dari daftar kata lain)
+            const jawabanSalah = kosakataBab3
+                .filter(k => k.arti !== soal.arti) // Ambil yang artinya beda
+                .sort(() => Math.random() - 0.5) // Acak
+                .slice(0, PILIHAN_JUMLAH - 1); // Ambil 4 jawaban salah
+
+            // Gabungkan jawaban benar + salah, lalu acak posisinya
+            const semuaPilihan = [...jawabanSalah, soal].sort(() => Math.random() - 0.5);
+
+            // Buat elemen pilihan A, B, C, D, E
+            const label = ['A', 'B', 'C', 'D', 'E'];
+            semuaPilihan.forEach((item, idx) => {
+                const tombol = document.createElement('button');
+                tombol.className = 'p-4 border-2 border-gray-200 rounded-lg text-left hover:border-japan-main hover:bg-red-50 transition-all jawaban-btn';
+                tombol.dataset.arti = item.arti;
+                tombol.dataset.benar = item.arti === soal.arti;
+                tombol.innerHTML = `<span class="font-bold mr-3 text-japan-main">${label[idx]}.</span> ${item.arti}`;
+                
+                tombol.addEventListener('click', pilihJawaban);
+                elPilihan.appendChild(tombol);
+            });
+        }
+
+        // Fungsi saat jawaban dipilih
+        function pilihJawaban(e) {
+            // Kunci semua tombol setelah memilih
+            document.querySelectorAll('.jawaban-btn').forEach(btn => {
+                btn.classList.remove('border-japan-main', 'bg-red-50', 'font-medium');
+                btn.disabled = true; 
+            });
+
+            // Tandai pilihan aktif
+            const tombolDipilih = e.currentTarget;
+            tombolDipilih.classList.add('border-japan-main', 'bg-red-50', 'font-medium');
+            
+            jawabanTerpilih = tombolDipilih.dataset.benar === 'true';
+
+            // Cek jawaban benar atau salah
+            if (jawabanTerpilih) {
+                skor += 10; // Nilai per soal 10 poin (Total 670 poin)
+                elSkor.innerText = skor;
+                tombolDipilih.classList.add('bg-green-100', 'border-green-500');
+            } else {
+                tombolDipilih.classList.add('bg-red-100', 'border-red-500');
+                // Tampilkan jawaban yang benar
+                const jawabanBenar = Array.from(document.querySelectorAll('.jawaban-btn')).find(btn => btn.dataset.benar === 'true');
+                jawabanBenar.classList.add('bg-green-100', 'border-green-500');
+            }
+
+            // Aktifkan tombol Selanjutnya
+            elBtnSelanjutnya.disabled = false;
+            elBtnSelanjutnya.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+
+        // Tombol Selanjutnya
+        elBtnSelanjutnya.addEventListener('click', () => {
+            nomorSekarang++;
+            
+            if (nomorSekarang < JUMLAH_SOAL) {
+                tampilkanSoal();
+            } else {
+                tampilkanHasilAkhir();
+            }
+        });
+
+        // Tampilkan Hasil Akhir
+        function tampilkanHasilAkhir() {
+            document.getElementById('infoPanel').classList.add('hidden');
+            document.getElementById('areaSoal').classList.add('hidden');
+            elBtnSelanjutnya.classList.add('hidden');
+            elBtnUlangi.classList.remove('hidden');
+            elHasilAkhir.classList.remove('hidden');
+            
+            const totalNilaiMaksimal = JUMLAH_SOAL * 10;
+            elSkorAkhir.innerText = `${skor} / ${totalNilaiMaksimal}`;
+            
+            // Pesan hasil sesuai nilai
+            if (skor >= 600) {
+                elPesanHasil.innerText = 'Sempurna! Kamu hafal semua kosakata Bab 3 dengan sangat baik.';
+            } else if (skor >= 500) {
+                elPesanHasil.innerText = 'Luar biasa! Penguasaan kosakatamu sangat tinggi.';
+            } else if (skor >= 400) {
+                elPesanHasil.innerText = 'Bagus sekali! Kamu sudah menguasai sebagian besar kosakata.';
+            } else if (skor >= 300) {
+                elPesanHasil.innerText = 'Cukup baik. Masih ada sedikit yang perlu diulang lagi.';
+            } else {
+                elPesanHasil.innerText = 'Jangan menyerah! Coba ulangi kuis ini berkali-kali sampai hafal.';
+            }
+        }
+
+        // Tombol Ulangi Kuis
+        elBtnUlangi.addEventListener('click', () => {
+            document.getElementById('infoPanel').classList.remove('hidden');
+            document.getElementById('areaSoal').classList.remove('hidden');
+            elBtnSelanjutnya.classList.remove('hidden');
+            mulaiKuis(); // Mulai ulang dan acak ulang soal
+        });
+
+        // Jalankan kuis saat halaman siap
+        document.addEventListener('DOMContentLoaded', mulaiKuis);
+
+    </script>
+</body>
+</html>
