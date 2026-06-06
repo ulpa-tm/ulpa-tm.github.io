@@ -1,1 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Kosakata Minna no Nihongo - Bab 7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        japan: {
+                            light: '#f0f4f8',
+                            main: '#8c1c13',
+                            secondary: '#2d3748',
+                            accent: '#e2b714',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            }
+        }
+    </style>
+</head>
+<body class="bg-japan-light font-sans min-h-screen flex flex-col items-center py-8 px-4">
+    <div class="w-full max-w-2xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-japan-main text-shadow">
+                <i class="fa fa-book mr-2"></i> Kuis Kosakata Bab 7
+            </h1>
+            <p class="text-gray-600 mt-2">Minna no Nihongo - Sesuai Dokumen Asli | Lengkap 75 Soal | Pilihan A-E</p>
+        </div>
 
+        <!-- Info & Skor -->
+        <div id="infoPanel" class="bg-white rounded-xl p-5 card-shadow mb-6 flex justify-between items-center">
+            <div>
+                <span class="font-semibold text-japan-secondary">Soal: </span>
+                <span id="nomorSoal">1</span>/<span id="totalSoal">75</span>
+            </div>
+            <div>
+                <span class="font-semibold text-japan-secondary">Skor: </span>
+                <span id="skor">0</span>
+            </div>
+        </div>
+
+        <!-- Area Soal -->
+        <div id="areaSoal" class="bg-white rounded-xl p-6 card-shadow mb-6 min-h-[300px] flex flex-col justify-center">
+            <div id="teksSoal" class="text-xl md:text-2xl font-bold text-center text-japan-secondary mb-8 py-4">
+                <!-- Teks soal akan muncul di sini -->
+            </div>
+
+            <!-- Pilihan Jawaban (A-E) -->
+            <div id="pilihanJawaban" class="grid grid-cols-1 gap-4">
+                <!-- Pilihan jawaban dimuat di sini -->
+            </div>
+        </div>
+
+        <!-- Tombol Navigasi -->
+        <div class="flex justify-between items-center">
+            <button id="btnUlangi" class="hidden px-6 py-3 bg-japan-accent text-white rounded-lg font-medium hover:bg-yellow-600 transition-all">
+                <i class="fa fa-refresh mr-2"></i> Ulangi Kuis
+            </button>
+            <div class="ml-auto">
+                <button id="btnSelanjutnya" class="px-6 py-3 bg-japan-main text-white rounded-lg font-medium hover:bg-[#701610] transition-all opacity-70 cursor-not-allowed" disabled>
+                    Selanjutnya <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hasil Akhir -->
+        <div id="hasilAkhir" class="hidden mt-8 bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+            <i class="fa fa-trophy text-5xl text-japan-accent mb-3"></i>
+            <h2 class="text-2xl font-bold text-japan-secondary mb-2">Kuis Selesai!</h2>
+            <p class="text-lg mb-2">Skor akhir kamu: <span id="skorAkhir" class="font-bold text-japan-main text-xl"></span></p>
+            <p id="pesanHasil" class="text-gray-700"></p>
+        </div>
+    </div>
+
+    <script>
+        // DATA KOSAKATA BAB 7 - 100% SESUAI GAMBAR DOKUMEN
+        // Ejaan Hiragana, Kanji, dan Arti SUDAH DIKOREKSI & SAMA PERSIS
+        const kosakataBab7 = [
+            { jepang: 'きります / 切ります', arti: 'Memotong / menggunting' },
+            { jepang: 'おくります / 送ります', arti: 'Mengirim' },
+            { jepang: 'あげます', arti: 'Memberikan' },
+            { jepang: 'もらいます', arti: 'Menerima / mendapatkan' },
+            { jepang: 'かします / 貸します', arti: 'Meminjamkan / menyewakan' },
+            { jepang: 'かります / 借ります', arti: 'Meminjam / menyewa' },
+            { jepang: 'おしえます / 教えます', arti: 'Mengajar' },
+            { jepang: 'ならいます / 習います', arti: 'Belajar (kepada)' },
+            { jepang: 'かけます (を)', arti: 'Menelpon' },
+            { jepang: 'て / 手', arti: 'Tangan' },
+            { jepang: 'はし', arti: 'Sumpit' },
+            { jepang: 'スプーン', arti: 'Sendok' },
+            { jepang: 'ナイフ', arti: 'Pisau' },
+            { jepang: 'フォーク', arti: 'Garpu' },
+            { jepang: 'はさみ', arti: 'Gunting' },
+            { jepang: 'パソコン', arti: 'Laptop' },
+            { jepang: 'ケータイ', arti: 'HP' },
+            { jepang: 'メール', arti: 'Email' },
+            { jepang: 'ねんがじょう / 年賀状', arti: 'Kartu tahun baru' },
+            { jepang: 'パンチ', arti: 'Pelubang kertas' },
+            { jepang: 'ホッチキス', arti: 'Stapler' },
+            { jepang: 'セロテープ', arti: 'Selotip' },
+            { jepang: 'けしゴム / 消しゴム', arti: 'Penghapus karet' },
+            { jepang: 'かみ / 紙', arti: 'Kertas' },
+            { jepang: 'はな / 花', arti: 'Bunga' },
+            { jepang: 'シャツ', arti: 'Kemeja' },
+            { jepang: 'プレゼント', arti: 'Hadiah / kado' },
+            { jepang: 'にもつ / 荷物', arti: 'Barang' },
+            { jepang: 'おかね / お金', arti: 'Uang' },
+            { jepang: 'きっぷ / 切符', arti: 'Karcis' },
+            { jepang: 'クリスマス', arti: 'Natal' },
+            { jepang: 'ちち / 父', arti: 'Ayah' },
+            { jepang: 'はは / 母', arti: 'Ibu' },
+            { jepang: 'おとうさん / お父さん', arti: 'Ayah orang lain' },
+            { jepang: 'おかあさん / お母さん', arti: 'Ibu orang lain' },
+            { jepang: 'もう', arti: 'Sudah' },
+            { jepang: 'まだ', arti: 'Belum' },
+            { jepang: 'これから', arti: 'Mulai dari sekarang' },
+            { jepang: 'すてきですね', arti: 'Bagus ya / indah ya' },
+            { jepang: 'いらっしゃい', arti: 'Selamat datang' },
+            { jepang: 'どうぞおあがりください', arti: 'Silakan masuk' },
+            { jepang: 'しつれいします / 失礼します', arti: 'Permisi' },
+            { jepang: '～いかがですか', arti: 'Bagaimana? (menawarkan sesuatu kepada orang)' },
+            { jepang: 'いただきます', arti: 'Selamat makan' },
+            { jepang: 'ごちそうさまでした', arti: 'Terima kasih atas hidangannya' },
+            { jepang: 'スペイン', arti: 'Spanyol' },
+            { jepang: 'かぞく / 家族', arti: 'Keluarga' },
+            { jepang: 'そぼ / 祖母', arti: 'Nenek' },
+            { jepang: 'そふ / 祖父', arti: 'Kakek' },
+            { jepang: 'そふぼ / 祖父母', arti: 'Kakek nenek' },
+            { jepang: 'りょうしん / 両親', arti: 'Orang tua' },
+            { jepang: 'いもうと / 妹', arti: 'Adik perempuan' },
+            { jepang: 'おとうと / 弟', arti: 'Adik laki-laki' },
+            { jepang: 'あね / 姉', arti: 'Kakak perempuan' },
+            { jepang: 'あに / 兄', arti: 'Kakak laki-laki' },
+            { jepang: 'きょうだい / 兄弟', arti: 'Saudara kandung' },
+            { jepang: 'つま / 妻', arti: 'Istri' },
+            { jepang: 'おっと / 夫', arti: 'Suami' },
+            { jepang: 'ふうふ / 夫婦', arti: 'Pasangan suami istri' },
+            { jepang: 'むすめ / 娘', arti: 'Anak perempuan' },
+            { jepang: 'むすこ / 息子', arti: 'Anak laki-laki' },
+            { jepang: 'こども / 子供', arti: 'Anak' },
+            { jepang: 'おばあさん', arti: 'Nenek (orang lain)' },
+            { jepang: 'おじいさん', arti: 'Kakek (orang lain)' },
+            { jepang: 'ごりょうしん / ご両親', arti: 'Orang tua (orang lain)' },
+            { jepang: 'いもうとさん', arti: 'Adik perempuan (orang lain)' },
+            { jepang: 'おとうとさん', arti: 'Adik laki-laki (orang lain)' },
+            { jepang: 'おねえさん', arti: 'Kakak perempuan (orang lain)' },
+            { jepang: 'おにいさん', arti: 'Kakak laki-laki (orang lain)' },
+            { jepang: 'ごきょうだい', arti: 'Saudara kandung (orang lain)' },
+            { jepang: 'おくさん', arti: 'Istri (orang lain)' },
+            { jepang: 'ごふうふ', arti: 'Pasangan suami istri (orang lain)' },
+            { jepang: 'むすめさん', arti: 'Anak perempuan (orang lain)' },
+            { jepang: 'むすこさん', arti: 'Anak laki-laki (orang lain)' },
+            { jepang: 'おこさん', arti: 'Anak (orang lain)' }
+        ];
+
+        // Variabel Global
+        let daftarSoal = [];
+        let nomorSekarang = 0;
+        let skor = 0;
+        let jawabanTerpilih = null;
+        const JUMLAH_SOAL = 75; // Total 75 kata sesuai dokumen
+        const PILIHAN_JUMLAH = 5; // Pilihan A, B, C, D, E
+
+        // Elemen DOM
+        const elNomorSoal = document.getElementById('nomorSoal');
+        const elTotalSoal = document.getElementById('totalSoal');
+        const elSkor = document.getElementById('skor');
+        const elTeksSoal = document.getElementById('teksSoal');
+        const elPilihan = document.getElementById('pilihanJawaban');
+        const elBtnSelanjutnya = document.getElementById('btnSelanjutnya');
+        const elBtnUlangi = document.getElementById('btnUlangi');
+        const elHasilAkhir = document.getElementById('hasilAkhir');
+        const elSkorAkhir = document.getElementById('skorAkhir');
+        const elPesanHasil = document.getElementById('pesanHasil');
+
+        // Inisialisasi Kuis
+        function mulaiKuis() {
+            // Reset variabel
+            nomorSekarang = 0;
+            skor = 0;
+            jawabanTerpilih = null;
+            elSkor.innerText = skor;
+            elHasilAkhir.classList.add('hidden');
+            elBtnUlangi.classList.add('hidden');
+            elBtnSelanjutnya.disabled = true;
+            elBtnSelanjutnya.classList.add('opacity-70', 'cursor-not-allowed');
+            
+            // ACAK SELURUH DAFTAR KOSAKATA
+            daftarSoal = [...kosakataBab7].sort(() => Math.random() - 0.5);
+            elTotalSoal.innerText = JUMLAH_SOAL;
+            
+            tampilkanSoal();
+        }
+
+        // Tampilkan Soal Saat Ini
+        function tampilkanSoal() {
+            const soal = daftarSoal[nomorSekarang];
+            elNomorSoal.innerText = nomorSekarang + 1;
+            
+            // Tampilkan teks soal
+            elTeksSoal.innerHTML = `Apakah arti dari: <br><span class="text-japan-main text-3xl mt-2 inline-block">${soal.jepang}</span>`;
+            
+            // Bersihkan pilihan sebelumnya
+            elPilihan.innerHTML = '';
+            jawabanTerpilih = null;
+            elBtnSelanjutnya.disabled = true;
+            elBtnSelanjutnya.classList.add('opacity-70', 'cursor-not-allowed');
+
+            // Buat daftar jawaban salah (diambil HANYA dari daftar Bab 7)
+            const jawabanSalah = kosakataBab7
+                .filter(k => k.arti !== soal.arti) // Ambil yang artinya beda
+                .sort(() => Math.random() - 0.5) // Acak urutan
+                .slice(0, PILIHAN_JUMLAH - 1); // Ambil 4 jawaban salah
+
+            // Gabungkan jawaban benar + salah, lalu acak posisinya
+            const semuaPilihan = [...jawabanSalah, soal].sort(() => Math.random() - 0.5);
+
+            // Buat elemen pilihan A, B, C, D, E
+            const label = ['A', 'B', 'C', 'D', 'E'];
+            semuaPilihan.forEach((item, idx) => {
+                const tombol = document.createElement('button');
+                tombol.className = 'p-4 border-2 border-gray-200 rounded-lg text-left hover:border-japan-main hover:bg-red-50 transition-all jawaban-btn';
+                tombol.dataset.arti = item.arti;
+                tombol.dataset.benar = item.arti === soal.arti;
+                tombol.innerHTML = `<span class="font-bold mr-3 text-japan-main">${label[idx]}.</span> ${item.arti}`;
+                
+                tombol.addEventListener('click', pilihJawaban);
+                elPilihan.appendChild(tombol);
+            });
+        }
+
+        // Fungsi saat jawaban dipilih
+        function pilihJawaban(e) {
+            // Kunci semua tombol setelah memilih
+            document.querySelectorAll('.jawaban-btn').forEach(btn => {
+                btn.classList.remove('border-japan-main', 'bg-red-50', 'font-medium');
+                btn.disabled = true; 
+            });
+
+            // Tandai pilihan aktif
+            const tombolDipilih = e.currentTarget;
+            tombolDipilih.classList.add('border-japan-main', 'bg-red-50', 'font-medium');
+            
+            jawabanTerpilih = tombolDipilih.dataset.benar === 'true';
+
+            // Cek jawaban benar atau salah
+            if (jawabanTerpilih) {
+                skor += 10; // Nilai per soal 10 poin (Total 750 poin)
+                elSkor.innerText = skor;
+                tombolDipilih.classList.add('bg-green-100', 'border-green-500');
+            } else {
+                tombolDipilih.classList.add('bg-red-100', 'border-red-500');
+                // Tampilkan jawaban yang benar
+                const jawabanBenar = Array.from(document.querySelectorAll('.jawaban-btn')).find(btn => btn.dataset.benar === 'true');
+                jawabanBenar.classList.add('bg-green-100', 'border-green-500');
+            }
+
+            // Aktifkan tombol Selanjutnya
+            elBtnSelanjutnya.disabled = false;
+            elBtnSelanjutnya.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+
+        // Tombol Selanjutnya
+        elBtnSelanjutnya.addEventListener('click', () => {
+            nomorSekarang++;
+            
+            if (nomorSekarang < JUMLAH_SOAL) {
+                tampilkanSoal();
+            } else {
+                tampilkanHasilAkhir();
+            }
+        });
+
+        // Tampilkan Hasil Akhir
+        function tampilkanHasilAkhir() {
+            document.getElementById('infoPanel').classList.add('hidden');
+            document.getElementById('areaSoal').classList.add('hidden');
+            elBtnSelanjutnya.classList.add('hidden');
+            elBtnUlangi.classList.remove('hidden');
+            elHasilAkhir.classList.remove('hidden');
+            
+            const totalNilaiMaksimal = JUMLAH_SOAL * 10;
+            elSkorAkhir.innerText = `${skor} / ${totalNilaiMaksimal}`;
+            
+            // Pesan hasil sesuai nilai
+            if (skor >= 675) {
+                elPesanHasil.innerText = 'Sempurna! Kamu hafal semua kosakata Bab 7 dengan sangat baik.';
+            } else if (skor >= 560) {
+                elPesanHasil.innerText = 'Luar biasa! Penguasaan kosakatamu sangat tinggi.';
+            } else if (skor >= 450) {
+                elPesanHasil.innerText = 'Bagus sekali! Kamu sudah menguasai sebagian besar kosakata.';
+            } else if (skor >= 300) {
+                elPesanHasil.innerText = 'Cukup baik. Masih ada sedikit yang perlu diulang lagi.';
+            } else {
+                elPesanHasil.innerText = 'Jangan menyerah! Coba ulangi kuis ini berkali-kali sampai hafal.';
+            }
+        }
+
+        // Tombol Ulangi Kuis
+        elBtnUlangi.addEventListener('click', () => {
+            document.getElementById('infoPanel').classList.remove('hidden');
+            document.getElementById('areaSoal').classList.remove('hidden');
+            elBtnSelanjutnya.classList.remove('hidden');
+            mulaiKuis(); // Mulai ulang dan acak ulang soal
+        });
+
+        // Jalankan kuis saat halaman siap
+        document.addEventListener('DOMContentLoaded', mulaiKuis);
+
+    </script>
+</body>
+</html>
