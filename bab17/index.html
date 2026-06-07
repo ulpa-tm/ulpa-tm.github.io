@@ -1,1 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Kosakata Jepang - Bab 17</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        jp: {
+                            red: '#D62828',
+                            gold: '#F77F00',
+                            blue: '#003049',
+                            light: '#FCBF49',
+                            cream: '#EAE2B7',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        jp: ['"Noto Sans JP"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #003049, #D62828);
+            min-height: 100vh;
+        }
+        .soal-card {
+            transition: all 0.3s ease;
+        }
+        .pilihan {
+            transition: all 0.2s ease;
+        }
+        .benar {
+            background-color: #10B981 !important;
+            color: white !important;
+        }
+        .salah {
+            background-color: #EF4444 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
 
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-white mb-2 drop-shadow-lg">
+                🇯🇵 Kuis Kosakata Jepang <br> <span class="text-jp-light">BAB 17</span>
+            </h1>
+            <p class="text-white/80">Uji ingatanmu! Pertanyaan muncul secara acak.</p>
+            <div class="mt-4 text-white font-semibold">Skor: <span id="skor">0</span> / <span id="total-soal">0</span></div>
+        </div>
+
+        <!-- Area Soal -->
+        <div id="area-soal" class="space-y-6">
+            <!-- Soal akan muncul di sini lewat JavaScript -->
+        </div>
+
+        <!-- Tombol Navigasi -->
+        <div class="flex justify-between mt-8">
+            <button id="btn-ulang" class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition-all">
+                🔄 Ulangi Kuis
+            </button>
+            <button id="btn-berikut" class="bg-jp-gold text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:scale-105 transition-all">
+                Soal Berikutnya ➡️
+            </button>
+        </div>
+
+        <!-- Hasil Akhir -->
+        <div id="hasil-akhir" class="hidden mt-10 bg-white/90 backdrop-blur-md rounded-2xl p-8 text-center shadow-2xl">
+            <h2 class="text-3xl font-bold text-jp-blue mb-4">🎉 Selesai!</h2>
+            <p class="text-xl mb-2">Skor Kamu:</p>
+            <p class="text-5xl font-bold text-jp-red mb-4" id="nilai-akhir">0</p>
+            <p id="pesan-hasil" class="text-lg text-gray-700"></p>
+            <button onclick="mulaiKuis()" class="mt-6 bg-jp-gold text-white px-8 py-3 rounded-lg font-semibold hover:scale-105 transition-all">
+                Main Lagi
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // ==============================================
+        // DAFTAR KOSAKATA BAB 17 (SUDAH DIKOREKSI)
+        // ==============================================
+        const kosakata = [
+            { id:1, jp:"おぼえます", kanji:"覚えます", arti:"Mengingat" },
+            { id:2, jp:"わすれます", kanji:"忘れます", arti:"Lupa" },
+            { id:3, jp:"なくします", kanji:"", arti:"Kehilangan, hilang" },
+            { id:4, jp:"はらいます", kanji:"払います", arti:"Membayar" },
+            { id:5, jp:"かえします", kanji:"返します", arti:"Mengembalikan" },
+            { id:6, jp:"でかけます", kanji:"", arti:"Keluar rumah" },
+            { id:7, jp:"ぬぎます", kanji:"脱ぎます", arti:"Melepas pakaian" },
+            { id:8, jp:"もっていきます", kanji:"持って行きます", arti:"Membawa pergi" },
+            { id:9, jp:"もってきます", kanji:"持って来ます", arti:"Membawa datang" },
+            { id:10, jp:"しんぱいします", kanji:"心配します", arti:"Khawatir" },
+            { id:11, jp:"ざんぎょうします", kanji:"残業します", arti:"Lembur" },
+            { id:12, jp:"しゅっちょうします", kanji:"出張します", arti:"Dinas" },
+            { id:13, jp:"たいせつな", kanji:"大切な", arti:"Penting" },
+            { id:14, jp:"だいじょうぶな", kanji:"大丈夫な", arti:"Tidak apa-apa" },
+            { id:15, jp:"あぶない", kanji:"危ない", arti:"Berbahaya" },
+            { id:16, jp:"きんえん", kanji:"禁煙", arti:"Dilarang merokok" },
+            { id:17, jp:"けんこうほけんしょう", kanji:"健康保険証", arti:"Kartu asuransi kesehatan" },
+            { id:18, jp:"ねつ", kanji:"", arti:"Demam" },
+            { id:19, jp:"びょうき", kanji:"病気", arti:"Sakit" },
+            { id:20, jp:"くすり", kanji:"薬", arti:"Obat" },
+            { id:21, jp:"おふろ", kanji:"", arti:"Kamar mandi" },
+            { id:22, jp:"うわぎ", kanji:"上着", arti:"Baju, jaket" },
+            { id:23, jp:"したぎ", kanji:"下着", arti:"Pakaian dalam" },
+            { id:24, jp:"までに", kanji:"", arti:"Sampai dengan (menyatakan batas waktu)" },
+            { id:25, jp:"ですから", kanji:"", arti:"Oleh karena itu" },
+            { id:26, jp:"どうしましたか", kanji:"", arti:"Apa yang terjadi, ada masalah apa?" },
+            { id:27, jp:"のど", kanji:"", arti:"Tenggorokan" },
+            { id:28, jp:"いたい", kanji:"痛い", arti:"Sakit (nyeri)" },
+            { id:29, jp:"かぜ", kanji:"", arti:"Masuk angin" },
+            { id:30, jp:"それから", kanji:"", arti:"Setelah itu, kemudian, dan" },
+            { id:31, jp:"おだいじに", kanji:"お大事に", arti:"Semoga lekas sembuh" },
+            { id:32, jp:"あたまがいたい", kanji:"頭が痛い", arti:"Sakit kepala" },
+            { id:33, jp:"おなかがいたい", kanji:"", arti:"Sakit perut" },
+            { id:34, jp:"はがいたい", kanji:"歯が痛い", arti:"Sakit gigi" },
+            { id:35, jp:"ねつがあります", kanji:"熱があります", arti:"Demam" },
+            { id:36, jp:"せきがでます", kanji:"咳が出ます", arti:"Batuk" },
+            { id:37, jp:"はなみずがでます", kanji:"鼻水が出ます", arti:"Pilek" },
+            { id:38, jp:"ちがでます", kanji:"血が出ます", arti:"Berdarah" },
+            { id:39, jp:"はきけがします", kanji:"吐き気がします", arti:"Mual" },
+            { id:40, jp:"さむけがします", kanji:"寒気がします", arti:"Kedinginan" },
+            { id:41, jp:"めまいがします", kanji:"", arti:"Pusing" },
+            { id:42, jp:"げりをします", kanji:"下痢をします", arti:"Mencret, diare" },
+            { id:43, jp:"べんぴをします", kanji:"便秘をします", arti:"Sembelit" },
+            { id:44, jp:"けがをします", kanji:"", arti:"Terluka" },
+            { id:45, jp:"やけどをします", kanji:"", arti:"Terbakar" },
+            { id:46, jp:"しょくよくがありません", kanji:"食欲がありません", arti:"Tidak nafsu makan" },
+            { id:47, jp:"かたがこります", kanji:"肩が凝ります", arti:"Bahu pegal" },
+            { id:48, jp:"からだがだるい", kanji:"", arti:"Badan lemas" },
+            { id:49, jp:"かゆい", kanji:"", arti:"Gatal" },
+            { id:50, jp:"インフルエンザ", kanji:"", arti:"Flu, influenza" },
+            { id:51, jp:"もうちょう", kanji:"盲腸", arti:"Usus buntu" },
+            { id:52, jp:"ぎっくりごし", kanji:"ぎっくり腰", arti:"Sakit pinggang" },
+            { id:53, jp:"ねんざ", kanji:"", arti:"Keseleo" },
+            { id:54, jp:"こっせつ", kanji:"骨折", arti:"Patah tulang" },
+            { id:55, jp:"ふつかよい", kanji:"二日酔い", arti:"Efek sesudah minum" }
+        ];
+
+        // ==============================================
+        // VARIABEL KUIS
+        // ==============================================
+        let daftarSoal = [];
+        let nomorSekarang = 0;
+        let skorBenar = 0;
+        let sudahDijawab = false;
+
+        // Elemen HTML
+        const areaSoal = document.getElementById('area-soal');
+        const skorEl = document.getElementById('skor');
+        const totalSoalEl = document.getElementById('total-soal');
+        const btnBerikut = document.getElementById('btn-berikut');
+        const btnUlang = document.getElementById('btn-ulang');
+        const hasilAkhirEl = document.getElementById('hasil-akhir');
+        const nilaiAkhirEl = document.getElementById('nilai-akhir');
+        const pesanHasilEl = document.getElementById('pesan-hasil');
+
+        // ==============================================
+        // FUNGSI UTAMA
+        // ==============================================
+        function mulaiKuis() {
+            // Reset semua
+            nomorSekarang = 0;
+            skorBenar = 0;
+            sudahDijawab = false;
+            hasilAkhirEl.classList.add('hidden');
+            areaSoal.innerHTML = '';
+            
+            // Acak urutan soal
+            daftarSoal = [...kosakata].sort(() => Math.random() - 0.5);
+            
+            // Tampilkan total
+            totalSoalEl.innerText = daftarSoal.length;
+            skorEl.innerText = skorBenar;
+
+            // Tampilkan soal pertama
+            tampilkanSoal();
+        }
+
+        function tampilkanSoal() {
+            sudahDijawab = false;
+            const soal = daftarSoal[nomorSekarang];
+
+            // Buat pilihan jawaban (A-E)
+            let pilihanJawaban = [soal.arti]; // Jawaban benar
+            // Ambil 4 jawaban acak lain
+            while(pilihanJawaban.length < 5) {
+                const acak = kosakata[Math.floor(Math.random() * kosakata.length)].arti;
+                if(!pilihanJawaban.includes(acak)) pilihanJawaban.push(acak);
+            }
+            // Acak posisi pilihan
+            pilihanJawaban = pilihanJawaban.sort(() => Math.random() - 0.5);
+
+            // HTML Soal
+            areaSoal.innerHTML = `
+            <div class="soal-card bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
+                <div class="mb-6 text-center">
+                    <span class="text-sm text-gray-500">Soal ${nomorSekarang+1} dari ${daftarSoal.length}</span>
+                    <h2 class="text-[clamp(1.5rem,4vw,2.5rem)] font-jp font-bold text-jp-blue mt-2">
+                        ${soal.jp}
+                    </h2>
+                    ${soal.kanji ? `<p class="text-xl text-jp-red font-semibold mt-1">${soal.kanji}</p>` : ''}
+                </div>
+
+                <div class="space-y-3 mt-8" id="daftar-pilihan">
+                    ${pilihanJawaban.map((pil, idx) => `
+                    <button class="pilihan w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-jp-gold hover:bg-jp-cream/30 transition-all" 
+                            data-jawaban="${pil}">
+                        <span class="font-bold mr-3">${String.fromCharCode(65+idx)}.</span> ${pil}
+                    </button>
+                    `).join('')}
+                </div>
+            </div>
+            `;
+
+            // Tambah event klik pilihan
+            document.querySelectorAll('.pilihan').forEach(btn => {
+                btn.addEventListener('click', cekJawaban);
+            });
+        }
+
+        function cekJawaban(e) {
+            if(sudahDijawab) return;
+            sudahDijawab = true;
+
+            const dipilih = e.target.closest('.pilihan');
+            const jawabanUser = dipilih.dataset.jawaban;
+            const jawabanBenar = daftarSoal[nomorSekarang].arti;
+
+            // Tandai benar/salah
+            document.querySelectorAll('.pilihan').forEach(btn => {
+                btn.classList.add('opacity-70');
+                if(btn.dataset.jawaban === jawabanBenar) btn.classList.add('benar');
+            });
+
+            if(jawabanUser === jawabanBenar) {
+                skorBenar++;
+                skorEl.innerText = skorBenar;
+                dipilih.classList.add('scale-[0.98]');
+            } else {
+                dipilih.classList.add('salah', 'scale-[0.98]');
+            }
+        }
+
+        function soalBerikutnya() {
+            nomorSekarang++;
+            if(nomorSekarang < daftarSoal.length) {
+                tampilkanSoal();
+            } else {
+                tampilkanHasil();
+            }
+        }
+
+        function tampilkanHasil() {
+            areaSoal.innerHTML = '';
+            hasilAkhirEl.classList.remove('hidden');
+            
+            const nilai = Math.round((skorBenar / daftarSoal.length) * 100);
+            nilaiAkhirEl.innerText = nilai + '%';
+
+            // Pesan sesuai nilai
+            if(nilai >= 90) pesanHasilEl.innerText = "Luar biasa! Hafalanmu sangat sempurna 👏";
+            else if(nilai >= 75) pesanHasilEl.innerText = "Bagus sekali! Sudah sangat paham 🎉";
+            else if(nilai >= 60) pesanHasilEl.innerText = "Cukup baik, tinggal sedikit lagi untuk sempurna 💪";
+            else pesanHasilEl.innerText = "Masih perlu latihan lagi, semangat ya! 😊";
+        }
+
+        // Event tombol
+        btnBerikut.addEventListener('click', soalBerikutnya);
+        btnUlang.addEventListener('click', mulaiKuis);
+
+        // Mulai kuis saat buka halaman
+        window.onload = mulaiKuis;
+    </script>
+</body>
+</html>
